@@ -7,6 +7,7 @@ import morgan from "morgan";
 
 import { errorMiddleware } from "../middleware/error.middleware";
 import { TYPES } from "../../application/constants/types";
+import { Logger } from "../logging/pino";
 
 import "../../application/rest_api/controllers/index.conroller";
 
@@ -17,14 +18,15 @@ export async function bootstrap(
 ) {
   if (!container.isBound(TYPES.App)) {
     container.load(...modules);
-    // const logger = container.get(TYPES.Logger);
-    // logger.info('Bootstrapping the service')
+    const logger = container.get<Logger>(TYPES.Logger).get();
+
+    logger.info("Bootstrapping the service");
 
     let server = new InversifyExpressServer(container, null, {
       rootPath: "/api/v1"
     });
 
-    // logger.info("Initializing express server");
+    logger.info("Initializing express server");
 
     server.setConfig((app) => {
       app.use(express.urlencoded({ extended: true }));

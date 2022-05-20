@@ -3,10 +3,12 @@ import { controller, httpGet, response } from "inversify-express-utils";
 import { Result } from "../../../domain/utilities/result";
 import { BaseController } from "../base/base.controller";
 
-@controller("/app")
+@controller("/")
 export class AppController extends BaseController {
   @httpGet("/")
   private ping(@response() res: Response) {
+    this.logger.info("Ping Pong");
+
     this.createResponse(
       res,
       Result.ok({

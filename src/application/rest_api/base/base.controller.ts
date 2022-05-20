@@ -3,11 +3,18 @@ import { inject, injectable } from "inversify";
 import { BaseHttpController } from "inversify-express-utils";
 
 import { Result } from "../../../domain/utilities/result";
+import { ILogger, Logger } from "../../../infra/logging/pino";
 import { TYPES } from "../../constants/types";
 
 @injectable()
 export abstract class BaseController extends BaseHttpController {
-  // @inject(TYPES.Logger) protected _logger: Logger\
+  protected logger: ILogger;
+
+  constructor(@inject(TYPES.Logger) logger: Logger) {
+    super();
+    this.logger = logger.get();
+  }
+
   protected createResponse<T>(
     response: Response,
     responseModel: Result<T>,
