@@ -1,34 +1,18 @@
 import "reflect-metadata";
-import morgan from "morgan";
-import cors from "cors";
-import { Application } from "express";
-import { Container } from "inversify";
-import { InversifyExpressServer } from "inversify-express-utils";
 
 import { AppSettings } from "./settings.ts/app.settings";
-import "./controllers/index.conroller";
+import { bootstrap } from "./infra/bootstrapping/bootstrap";
+import { container } from "./inversify.config";
 
-class App {
-  public express: Application;
-  constructor() {
-    let container = new Container();
-
-    let server = new InversifyExpressServer(container, null, {
-      rootPath: "/api/v1"
-    });
-
-    server.setConfig((app) => {
-      const logger = morgan("combined");
-      app.use(logger);
-      app.use(cors());
-    });
-
-    this.express = server.build();
-  }
+export async function runApp() {
+  const port = Number(AppSettings.PORT || 3000);
+  const app = await bootstrap(container, port);
+  return app;
 }
 
-const app = new App().express;
-
-app.listen(AppSettings.PORT, () => {
-  console.log(`Started listening at ${AppSettings.PORT}`);
+(async () => {
+  await runApp();
+})().catch((e) => {
+  console.error(e);
+  process.exit(1);
 });
