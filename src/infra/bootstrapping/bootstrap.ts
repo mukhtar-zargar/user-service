@@ -10,6 +10,7 @@ import { TYPES } from "../../application/constants/types";
 import { Logger } from "../logging/pino";
 
 import "../../application/rest_api/controllers/index.conroller";
+import { AppDataSource } from "../typeorm/typeorm.config";
 
 export async function bootstrap(
   container: Container,
@@ -41,9 +42,13 @@ export async function bootstrap(
     });
 
     try {
+      await AppDataSource.initialize();
+
+      logger.info("Initialized database");
+
       const app = server.build();
       app.listen(port, () => {
-        console.log(`Service live at http://localhost:${port}/api/v1`);
+        logger.info(`Service live at http://localhost:${port}/api/v1`);
         // logger.info(`Service live at http://localhost:${port}/api/v1`);
       });
 
