@@ -24,6 +24,10 @@ export class User extends Entity<IUserProps> {
     return this.email;
   }
 
+  set password(text: string) {
+    this.password = text;
+  }
+
   get password(): string {
     return this.password;
   }

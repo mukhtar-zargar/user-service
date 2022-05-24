@@ -30,7 +30,12 @@ export class Result<T> {
   }
 
   public static fail<U>(message: string, errorCode: ErrorCode): Result<U> {
-    return new Result<U>(false, message, undefined, errorCode);
+    return new Result<U>(
+      false,
+      message,
+      undefined,
+      errorCode || "INTERNAL_SERVER_ERROR"
+    );
   }
 
   public static combine(results: Result<any>[]): Result<any> {

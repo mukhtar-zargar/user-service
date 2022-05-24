@@ -9,7 +9,8 @@ import { errorMiddleware } from "../middleware/error.middleware";
 import { TYPES } from "../../application/constants/types";
 import { Logger } from "../logging/pino";
 
-import "../../application/rest_api/controllers/index.conroller";
+import "../../application/rest_api/controllers/index.controller";
+import "../../application/rest_api/controllers/user.controller";
 import { AppDataSource } from "../typeorm/typeorm.config";
 
 export async function bootstrap(

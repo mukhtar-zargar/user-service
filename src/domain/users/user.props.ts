@@ -6,9 +6,9 @@ export interface IUserSignInProps {
 export interface IUserProps extends IUserSignInProps {
   id?: string;
   name: string;
-  savedPosts: string[];
-  createdAt: Date;
-  updatedAt: Date;
+  savedPosts?: string[];
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface IUserWithTokenProps extends IUserProps {

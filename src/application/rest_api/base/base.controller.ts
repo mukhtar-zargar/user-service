@@ -22,7 +22,10 @@ export abstract class BaseController extends BaseHttpController {
   ): void {
     if (responseModel.success) {
       response.status(successStatusCode || 200);
-    } else if (!responseModel.errorCode) {
+    } else if (
+      !responseModel.errorCode ||
+      responseModel.errorCode === "INTERNAL_SERVER_ERROR"
+    ) {
       response.status(500);
     } else if (responseModel.errorCode === "INVALID_REQUEST") {
       response.status(400);
