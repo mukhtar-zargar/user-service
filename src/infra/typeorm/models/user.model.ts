@@ -11,7 +11,7 @@ import {
 
 @Entity()
 @injectable()
-export class User extends BaseEntity {
+export class User {
   @ObjectIdColumn()
   id: ObjectID;
 

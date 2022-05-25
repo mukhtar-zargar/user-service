@@ -10,5 +10,5 @@ export interface IUserRepository {
   findAll(): Promise<User[]>;
   signUp(user: IUserProps): Promise<User>;
   signIn(signInInfo: IUserSignInProps): Promise<IUserWithTokenProps>;
-  update(user: User): Promise<User>;
+  update(user: IUserProps): Promise<User>;
 }

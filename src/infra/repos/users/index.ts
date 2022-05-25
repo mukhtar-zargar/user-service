@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import { ObjectID } from "typeorm";
+import { MongoRepository, ObjectID } from "typeorm";
 
 import { User as UserModel } from "../../typeorm/models/user.model";
 import { User } from "../../../domain/users/user";
@@ -12,13 +12,22 @@ import { hashIt } from "../../encryption";
 import { Logger, ILogger } from "../../logging/pino";
 import { TYPES } from "../../../application/constants/types";
 import { CustomError } from "../../errors/base.error";
+import { IAppDataSource } from "../../typeorm/typeorm.config";
+import { getObjectId } from "../../typeorm/utils";
 
 @injectable()
 export class UserRepository implements IUserRepository {
   protected logger: ILogger;
+  protected userRepository: MongoRepository<UserModel>;
 
-  constructor(@inject(TYPES.Logger) logger: Logger) {
+  constructor(
+    @inject(TYPES.Logger) logger: Logger,
+    @inject(TYPES.DataSource) appDataSource: IAppDataSource
+  ) {
     this.logger = logger.get();
+    this.userRepository = appDataSource
+      .instance()
+      .getMongoRepository(UserModel);
   }
 
   findAll(): Promise<User[]> {
@@ -27,7 +36,7 @@ export class UserRepository implements IUserRepository {
 
   async signUp(user: User): Promise<User> {
     try {
-      const check = await UserModel.findOneBy({ email: user.email });
+      const check = await this.userRepository.findOneBy({ email: user.email });
 
       if (check) {
         throw new CustomError({
@@ -38,11 +47,11 @@ export class UserRepository implements IUserRepository {
       }
 
       user.password = hashIt(user.password);
-      let userToSave = UserModel.create(user);
-      const res = await userToSave.save();
+      let userToSave = this.userRepository.create(user);
+      const res = await this.userRepository.save(userToSave);
       return User.create({ ...res, id: res.id.toString() });
     } catch (err) {
-      this.logger.error(`<Error> Repository SignUp - ${err}`);
+      this.logger.error(`<Error> UserRepositorySignUp - ${err}`);
 
       throw err;
     }
@@ -53,23 +62,41 @@ export class UserRepository implements IUserRepository {
   }
 
   async update(user: User): Promise<User> {
-    const check = await UserModel.findOneBy({ id: new ObjectID(user.id) });
-    if (!check) {
-      throw new Error("Does Not Exist");
-    }
+    this.logger.info(`User ${JSON.stringify(user)}`);
+    let existingUser = await this.userRepository.findOneBy({
+      _id: getObjectId(user.id)
+    });
+    this.logger.info(`Check ${JSON.stringify(existingUser)}`);
+
     try {
+      if (!existingUser) {
+        throw new CustomError({
+          message: "User doesn't exists",
+          status: 400,
+          errorCode: "INVALID_REQUEST"
+        });
+      }
+
       if (user.password) {
         user.password = hashIt(user.password);
       }
-      const res = await UserModel.save(user);
-      return User.create({ ...res, id: res.id.toString() });
+      existingUser = this.userRepository.create({ ...existingUser, ...user });
+      await this.userRepository.findOneAndUpdate(
+        {
+          _id: getObjectId(user.id)
+        },
+        {$set: existingUser}
+      );
+      return User.create({ ...existingUser, id: existingUser.id.toString() });
     } catch (err) {
-      throw new Error("DB Error");
+      this.logger.error(`<Error> UserRepositoryUpdate - ${err}`);
+
+      throw err;
     }
   }
 
   async getById(id: string): Promise<User> {
-    const user = await UserModel.findOneBy({ id: new ObjectID(id) });
+    const user = await this.userRepository.findOneBy({ id });
     return User.create({ ...user, id: user.id.toString() });
   }
 }

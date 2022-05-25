@@ -11,7 +11,8 @@ import { Logger } from "../logging/pino";
 
 import "../../application/rest_api/controllers/index.controller";
 import "../../application/rest_api/controllers/user.controller";
-import { AppDataSource } from "../typeorm/typeorm.config";
+import { IAppDataSource } from "../typeorm/typeorm.config";
+// import { AppDataSource } from "../typeorm/typeorm.config";
 
 export async function bootstrap(
   container: Container,
@@ -43,14 +44,17 @@ export async function bootstrap(
     });
 
     try {
-      await AppDataSource.initialize();
+      const appDataSource = container
+        .get<IAppDataSource>(TYPES.DataSource)
+        .instance();
+
+      await appDataSource.initialize();
 
       logger.info("Initialized database");
 
       const app = server.build();
       app.listen(port, () => {
         logger.info(`Service live at http://localhost:${port}/api/v1`);
-        // logger.info(`Service live at http://localhost:${port}/api/v1`);
       });
 
       container.bind<express.Application>(TYPES.App).toConstantValue(app);

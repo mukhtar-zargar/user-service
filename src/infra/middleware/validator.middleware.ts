@@ -21,7 +21,14 @@ export const validationMiddleware = (dtoClass: any) => {
           errorTexts = errorTexts.concat(errorItem.constraints);
         }
         // Result.fail(errorTexts[0], "INVALID_REQUEST");
-        res.status(400).send(Result.fail(errorTexts[0], "INVALID_REQUEST"));
+        res
+          .status(400)
+          .send(
+            Result.fail(
+              String(Object.values(errorTexts[0])[0]),
+              "INVALID_REQUEST"
+            )
+          );
         return;
       } else {
         res.locals.input = output;
