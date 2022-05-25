@@ -71,7 +71,7 @@ export class UserRepository implements IUserRepository {
     try {
       if (!existingUser) {
         throw new CustomError({
-          message: "User doesn't exists",
+          message: "Invalid id",
           status: 400,
           errorCode: "INVALID_REQUEST"
         });
@@ -85,7 +85,7 @@ export class UserRepository implements IUserRepository {
         {
           _id: getObjectId(user.id)
         },
-        {$set: existingUser}
+        { $set: existingUser }
       );
       return User.create({ ...existingUser, id: existingUser.id.toString() });
     } catch (err) {
@@ -96,7 +96,22 @@ export class UserRepository implements IUserRepository {
   }
 
   async getById(id: string): Promise<User> {
-    const user = await this.userRepository.findOneBy({ id });
-    return User.create({ ...user, id: user.id.toString() });
+    try {
+      const user = await this.userRepository.findOneBy({
+        _id: getObjectId(id)
+      });
+      if (!user) {
+        throw new CustomError({
+          message: "Invalid id",
+          status: 400,
+          errorCode: "INVALID_REQUEST"
+        });
+      }
+      return User.create({ ...user, id: user.id.toString() });
+    } catch (err) {
+      this.logger.error(`<Error> UserRepositoryGet - ${err}`);
+
+      throw err;
+    }
   }
 }
