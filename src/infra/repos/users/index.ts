@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import { MongoRepository, ObjectID } from "typeorm";
+import { MongoRepository } from "typeorm";
 
 import { User as UserModel } from "../../typeorm/models/user.model";
 import { User } from "../../../domain/users/user";
@@ -18,25 +18,25 @@ import { getObjectId } from "../../typeorm/utils";
 @injectable()
 export class UserRepository implements IUserRepository {
   protected logger: ILogger;
-  protected userRepository: MongoRepository<UserModel>;
+  protected userDataSourse: MongoRepository<UserModel>;
 
   constructor(
     @inject(TYPES.Logger) logger: Logger,
     @inject(TYPES.DataSource) appDataSource: IAppDataSource
   ) {
     this.logger = logger.get();
-    this.userRepository = appDataSource
+    this.userDataSourse = appDataSource
       .instance()
       .getMongoRepository(UserModel);
   }
 
-  findAll(): Promise<User[]> {
+  getAll(): Promise<User[]> {
     throw new Error("Method not implemented.");
   }
 
   async signUp(user: User): Promise<User> {
     try {
-      const check = await this.userRepository.findOneBy({ email: user.email });
+      const check = await this.userDataSourse.findOneBy({ email: user.email });
 
       if (check) {
         throw new CustomError({
@@ -47,8 +47,8 @@ export class UserRepository implements IUserRepository {
       }
 
       user.password = hashIt(user.password);
-      let userToSave = this.userRepository.create(user);
-      const res = await this.userRepository.save(userToSave);
+      let userToSave = this.userDataSourse.create(user);
+      const res = await this.userDataSourse.save(userToSave);
       return User.create({ ...res, id: res.id.toString() });
     } catch (err) {
       this.logger.error(`<Error> UserRepositorySignUp - ${err}`);
@@ -63,7 +63,7 @@ export class UserRepository implements IUserRepository {
 
   async update(user: User): Promise<User> {
     this.logger.info(`User ${JSON.stringify(user)}`);
-    let existingUser = await this.userRepository.findOneBy({
+    let existingUser = await this.userDataSourse.findOneBy({
       _id: getObjectId(user.id)
     });
     this.logger.info(`Check ${JSON.stringify(existingUser)}`);
@@ -80,8 +80,8 @@ export class UserRepository implements IUserRepository {
       if (user.password) {
         user.password = hashIt(user.password);
       }
-      existingUser = this.userRepository.create({ ...existingUser, ...user });
-      await this.userRepository.findOneAndUpdate(
+      existingUser = this.userDataSourse.create({ ...existingUser, ...user });
+      await this.userDataSourse.findOneAndUpdate(
         {
           _id: getObjectId(user.id)
         },
@@ -97,9 +97,10 @@ export class UserRepository implements IUserRepository {
 
   async getById(id: string): Promise<User> {
     try {
-      const user = await this.userRepository.findOneBy({
+      const user = await this.userDataSourse.findOneBy({
         _id: getObjectId(id)
       });
+
       if (!user) {
         throw new CustomError({
           message: "Invalid id",
@@ -107,6 +108,7 @@ export class UserRepository implements IUserRepository {
           errorCode: "INVALID_REQUEST"
         });
       }
+
       return User.create({ ...user, id: user.id.toString() });
     } catch (err) {
       this.logger.error(`<Error> UserRepositoryGet - ${err}`);

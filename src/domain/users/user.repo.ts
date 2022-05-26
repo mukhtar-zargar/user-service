@@ -7,7 +7,7 @@ import {
 
 export interface IUserRepository {
   getById(id: string): Promise<User>;
-  findAll(): Promise<User[]>;
+  getAll(): Promise<User[]>;
   signUp(user: IUserProps): Promise<User>;
   signIn(signInInfo: IUserSignInProps): Promise<IUserWithTokenProps>;
   update(user: IUserProps): Promise<User>;
