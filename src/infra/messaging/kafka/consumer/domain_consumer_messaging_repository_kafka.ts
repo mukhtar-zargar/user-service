@@ -1,4 +1,5 @@
 import { Consumer, EachMessagePayload, Kafka, logLevel } from "kafkajs";
+
 import {
   ConsumerOptions,
   DefaultConsumerOptions,
@@ -18,18 +19,18 @@ export class DomainConsumerMessagingRepositoryKafka implements IDomainConsumerMe
   constructor(kafkaConfiguration: KafkaConfiguration) {
     this._kafkaConfiguration = kafkaConfiguration;
     this._kafkaClient = new Kafka({
-      clientId: "",
+      clientId: "ghost",
       connectionTimeout: kafkaConfiguration.KAFKA_CONNECTION_TIMEOUT,
       brokers: kafkaConfiguration.KAFKA_BROKERS,
-      ssl: {
-        rejectUnauthorized: false,
-        ca: [kafkaConfiguration.KAFKA_CERTIFICATE]
-      },
-      sasl: {
-        mechanism: kafkaConfiguration.KAFKA_SASL_MECHANISM as any,
-        username: kafkaConfiguration.KAFKA_SASL_USERNAME,
-        password: kafkaConfiguration.KAFKA_SASL_PASSWORD
-      },
+      // ssl: {
+      //   rejectUnauthorized: false,
+      //   ca: [kafkaConfiguration.KAFKA_CERTIFICATE]
+      // },
+      // sasl: {
+      //   mechanism: kafkaConfiguration.KAFKA_SASL_MECHANISM as any,
+      //   username: kafkaConfiguration.KAFKA_SASL_USERNAME,
+      //   password: kafkaConfiguration.KAFKA_SASL_PASSWORD
+      // },
       logLevel: logLevel.INFO
     });
   }
@@ -38,7 +39,7 @@ export class DomainConsumerMessagingRepositoryKafka implements IDomainConsumerMe
     subscriptionParametersList: SubscriptionParameters[],
     consumerOptions?: ConsumerOptions
   ): Promise<boolean | IEventQueue<InboxMessage>> {
-    const groupId = consumerOptions?.groupId || this._kafkaConfiguration.KAFKA_CONSUMER_GROUP_ID;
+    const groupId = consumerOptions?.groupId || this._kafkaConfiguration.KAFKA_CONSUMER_GROUP_ID || "postGuid";
 
     this._consumer = this._kafkaClient.consumer({
       groupId,
@@ -63,6 +64,7 @@ export class DomainConsumerMessagingRepositoryKafka implements IDomainConsumerMe
           // log
         }
       });
+
       subscriptionPromises.push(consumer.subscribe({ topic, fromBeginning: readFromBeginning }));
     });
 
@@ -76,9 +78,9 @@ export class DomainConsumerMessagingRepositoryKafka implements IDomainConsumerMe
 
         const subscriptionPromises = subscriptionParametersList.map(async (subscriptionParameters) => {
           const noAvroDecoding = subscriptionParameters.noAvroDecoding || false;
-          const headers = {};
-          const eventType = "";
-          // const eventType = headers[HEADER.EventType] || "";
+          const headers = this.parseHeaders(payload);
+          const eventType = headers["eventType"] ? headers["eventType"] : "";
+
           const isSubscribed = this.isHandlerSubscribed(subscriptionParameters, incomingMessageTopic, eventType);
 
           if (isSubscribed) {
@@ -88,11 +90,23 @@ export class DomainConsumerMessagingRepositoryKafka implements IDomainConsumerMe
 
             await this.enqueueForProcessing(decodedMessage, subscriptionParameters, consumer);
           }
+
         });
         await Promise.all(subscriptionPromises);
       }
     });
     return true;
+  }
+
+  private parseHeaders(payload: any) {
+    const headers: any = {};
+    Object.keys(payload.message.headers).forEach((prop) => {
+      // eslint-disable-next-line no-prototype-builtins
+      if (payload.message.headers.hasOwnProperty(prop)) {
+        headers[prop] = payload.message.headers[prop] ? payload.message.headers[prop].toString("utf8") : "";
+      }
+    });
+    return headers;
   }
 
   private async decodeMessage(noAvroDecoding: boolean, payload: EachMessagePayload) {
@@ -111,15 +125,15 @@ export class DomainConsumerMessagingRepositoryKafka implements IDomainConsumerMe
   private async parseBody(noAvroDecoding: boolean, payload: EachMessagePayload) {
     let value;
 
-    if (!noAvroDecoding) {
-    } else {
-      try {
-        value = payload.message.value ? JSON.parse(payload.message.value.toString("utf-8")) : "";
-      } catch (err) {
-        // log
-        value = payload.message.value;
-      }
+    // if (!noAvroDecoding) {
+    // } else {
+    try {
+      value = payload.message.value ? JSON.parse(payload.message.value.toString("utf-8")) : "";
+    } catch (err) {
+      // log
+      value = payload.message.value;
     }
+    // }
 
     return value;
   }

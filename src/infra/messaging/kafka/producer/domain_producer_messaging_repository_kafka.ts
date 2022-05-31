@@ -63,6 +63,8 @@ export class DomainProducerMessagingRepositoryKafka implements IDomainProducerMe
 
     event.dateTimeOccurred = new Date();
 
+    const headers: any = this.setHeaders(event, doNotCarryForwardSourceStampings);
+
     const request: IProducerRequest = {
       topic: [topic],
       value: JSON.stringify(event.data),
@@ -70,7 +72,7 @@ export class DomainProducerMessagingRepositoryKafka implements IDomainProducerMe
       seconds: 1,
       avroschemaName: event.schema,
       schemaId: event.schemaId,
-      header: undefined
+      header: headers
     };
 
     let encodedValue: Buffer | null = null;
@@ -79,7 +81,8 @@ export class DomainProducerMessagingRepositoryKafka implements IDomainProducerMe
       const messages = [
         {
           key: request.key ? request.key.toLowerCase() : request.key,
-          value: !noAvroEncoding ? encodedValue : request.value
+          value: !noAvroEncoding ? encodedValue : request.value,
+          headers
         }
       ];
 
@@ -93,6 +96,12 @@ export class DomainProducerMessagingRepositoryKafka implements IDomainProducerMe
       // Log
       throw err;
     }
+  }
+
+  private setHeaders(event: IntegrationEventRecord, doNotCarryForwardSourceStampings: boolean | undefined) {
+    const headers: any = {};
+    headers["eventType"] = event.eventType;
+    return headers;
   }
 
   private async produceTransactionalMessage(topic: string, messages: any, eventType: string) {
