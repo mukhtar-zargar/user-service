@@ -12,13 +12,8 @@ import { Logger } from "../logging/pino";
 import "../../application/rest_api/controllers/index.controller";
 import "../../application/rest_api/controllers/user.controller";
 import { IAppDataSource } from "../typeorm/typeorm.config";
-// import { AppDataSource } from "../typeorm/typeorm.config";
 
-export async function bootstrap(
-  container: Container,
-  port: number,
-  ...modules: ContainerModule[]
-) {
+export async function bootstrap(container: Container, port: number, ...modules: ContainerModule[]) {
   if (!container.isBound(TYPES.App)) {
     container.load(...modules);
     const logger = container.get<Logger>(TYPES.Logger).get();
@@ -44,9 +39,7 @@ export async function bootstrap(
     });
 
     try {
-      const appDataSource = container
-        .get<IAppDataSource>(TYPES.DataSource)
-        .instance();
+      const appDataSource = container.get<IAppDataSource>(TYPES.DataSource).instance();
 
       await appDataSource.initialize();
 

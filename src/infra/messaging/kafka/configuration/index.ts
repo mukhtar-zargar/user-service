@@ -1,17 +1,17 @@
 interface IKafkaConfigParams {
-  KAFKA_SASL_MECHANISM: string;
+  KAFKA_BROKERS: string[];
   KAFKA_SASL_USERNAME: string;
   KAFKA_SASL_PASSWORD: string;
-  KAFKA_CERTIFICATE_BASE64: string;
-  KAFKA_SCHEMA_REGISTRY_USERNAME: string;
-  KAFKA_SCHEMA_REGISTRY_PASSWORD: string;
-  KAFKA_BROKERS: string[];
-  KAFKA_SCHEMA_REGISTRY_URL: string;
-  KAFKA_CONNECTION_TIMEOUT: number;
-  KAFKA_TRANSACTION_TIMEOUT: number;
-  KAFKA_CONSUMER_GROUP_ID: string;
-  KAFKA_DEFAULT_DLQ_TOPIC: string;
-  KAFKA_CORRELATION_ID_MAX_LENGTH: number;
+  KAFKA_SASL_MECHANISM?: string;
+  KAFKA_CERTIFICATE_BASE64?: string;
+  KAFKA_SCHEMA_REGISTRY_USERNAME?: string;
+  KAFKA_SCHEMA_REGISTRY_PASSWORD?: string;
+  KAFKA_SCHEMA_REGISTRY_URL?: string;
+  KAFKA_CONNECTION_TIMEOUT?: number;
+  KAFKA_TRANSACTION_TIMEOUT?: number;
+  KAFKA_CONSUMER_GROUP_ID?: string;
+  KAFKA_DEFAULT_DLQ_TOPIC?: string;
+  KAFKA_CORRELATION_ID_MAX_LENGTH?: number;
 }
 
 class KafkaConfiguration {
@@ -46,26 +46,18 @@ class KafkaConfiguration {
     this.KAFKA_SASL_MECHANISM = kafkaConfigParams.KAFKA_SASL_MECHANISM;
     this.KAFKA_SASL_PASSWORD = kafkaConfigParams.KAFKA_SASL_PASSWORD;
     this.KAFKA_SASL_USERNAME = kafkaConfigParams.KAFKA_SASL_USERNAME;
-    this.KAFKA_CERTIFICATE = Buffer.from(
-      kafkaConfigParams.KAFKA_CERTIFICATE_BASE64,
-      "base64"
-    ).toString("utf-8");
-    this.KAFKA_SCHEMA_REGISTRY_PASSWORD =
-      kafkaConfigParams.KAFKA_SCHEMA_REGISTRY_PASSWORD;
-    this.KAFKA_SCHEMA_REGISTRY_URL =
-      kafkaConfigParams.KAFKA_SCHEMA_REGISTRY_URL;
-    this.KAFKA_SCHEMA_REGISTRY_USERNAME =
-      kafkaConfigParams.KAFKA_SCHEMA_REGISTRY_USERNAME;
+    this.KAFKA_CERTIFICATE = Buffer.from(kafkaConfigParams.KAFKA_CERTIFICATE_BASE64, "base64").toString("utf-8");
+    this.KAFKA_SCHEMA_REGISTRY_PASSWORD = kafkaConfigParams.KAFKA_SCHEMA_REGISTRY_PASSWORD;
+    this.KAFKA_SCHEMA_REGISTRY_URL = kafkaConfigParams.KAFKA_SCHEMA_REGISTRY_URL;
+    this.KAFKA_SCHEMA_REGISTRY_USERNAME = kafkaConfigParams.KAFKA_SCHEMA_REGISTRY_USERNAME;
     this.KAFKA_CONNECTION_TIMEOUT = kafkaConfigParams.KAFKA_CONNECTION_TIMEOUT;
-    this.KAFKA_TRANSACTION_TIMEOUT =
-      kafkaConfigParams.KAFKA_TRANSACTION_TIMEOUT;
+    this.KAFKA_TRANSACTION_TIMEOUT = kafkaConfigParams.KAFKA_TRANSACTION_TIMEOUT;
     this.KAFKA_CONSUMER_GROUP_ID = kafkaConfigParams.KAFKA_CONSUMER_GROUP_ID;
     this.KAFKA_DEFAULT_DLQ_TOPIC = kafkaConfigParams.KAFKA_DEFAULT_DLQ_TOPIC;
-    this.KAFKA_CORRELATION_ID_MAX_LENGTH =
-      kafkaConfigParams.KAFKA_CORRELATION_ID_MAX_LENGTH;
+    this.KAFKA_CORRELATION_ID_MAX_LENGTH = kafkaConfigParams.KAFKA_CORRELATION_ID_MAX_LENGTH;
   }
 
-  static async getKafkaConfiguration(config: IKafkaConfigParams) {
+  static getKafkaConfiguration(config: IKafkaConfigParams) {
     return new KafkaConfiguration(config);
   }
 }

@@ -12,4 +12,8 @@ export class AppSettings {
   public static readonly DB_PASSWORD = process.env.DB_PASSWORD;
   public static readonly DB_AUTHSOURCE = process.env.DB_AUTHSOURCE;
   public static readonly JWT_SECRET = process.env.JWT_SECRET;
+
+  public static readonly KAFKA_BROKER = process.env.KAFKA_BROKER;
+  public static readonly KAFKA_SASL_USERNAME = process.env.KAFKA_SASL_USERNAME;
+  public static readonly KAFKA_SASL_PASSWORD = process.env.KAFKA_SASL_PASSWORD;
 }

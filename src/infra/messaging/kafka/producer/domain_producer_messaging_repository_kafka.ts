@@ -1,3 +1,4 @@
+import { injectable } from "inversify";
 import { Kafka, logLevel, Partitioners, Producer, Transaction } from "kafkajs";
 import { v4 } from "uuid";
 
@@ -9,6 +10,7 @@ import {
 } from "../../../../domain/ports/messaging/producer";
 import { KafkaConfiguration } from "../configuration";
 
+@injectable()
 export class DomainProducerMessagingRepositoryKafka implements IDomainProducerMessagingRepository {
   private _kafkaClient: Kafka;
 
@@ -20,18 +22,18 @@ export class DomainProducerMessagingRepositoryKafka implements IDomainProducerMe
     this._kafkaConfiguration = kafkaConfiguration;
 
     this._kafkaClient = new Kafka({
-      clientId: "",
+      clientId: "ghost",
       connectionTimeout: kafkaConfiguration.KAFKA_CONNECTION_TIMEOUT,
       brokers: kafkaConfiguration.KAFKA_BROKERS,
-      ssl: {
-        rejectUnauthorized: false,
-        ca: [kafkaConfiguration.KAFKA_CERTIFICATE]
-      },
-      sasl: {
-        mechanism: kafkaConfiguration.KAFKA_SASL_MECHANISM as any,
-        username: kafkaConfiguration.KAFKA_SASL_USERNAME,
-        password: kafkaConfiguration.KAFKA_SASL_PASSWORD
-      },
+      // ssl: {
+      //   rejectUnauthorized: false,
+      //   ca: [kafkaConfiguration.KAFKA_CERTIFICATE]
+      // },
+      // sasl: {
+      //   mechanism: kafkaConfiguration.KAFKA_SASL_MECHANISM as any,
+      //   username: kafkaConfiguration.KAFKA_SASL_USERNAME,
+      //   password: kafkaConfiguration.KAFKA_SASL_PASSWORD
+      // },
       logLevel: logLevel.INFO
     });
 

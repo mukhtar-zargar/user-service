@@ -3,7 +3,8 @@ const TYPES = {
   Logger: Symbol.for("Logger"),
   EventQueue: Symbol("EventsQueue"),
   UserRepository: Symbol("UserRepository"),
-  DataSource: Symbol("DataSource")
+  DataSource: Symbol("DataSource"),
+  MessagingProducer: Symbol("MessagingProducer")
 };
 
 export { TYPES };
