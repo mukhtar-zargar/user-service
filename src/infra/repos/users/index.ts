@@ -13,6 +13,7 @@ import { CustomError } from "../../errors/base.error";
 import { IAppDataSource } from "../../typeorm/typeorm.config";
 import { getObjectId } from "../../typeorm/utils";
 import { IDomainProducerMessagingRepository } from "../../../domain/ports/messaging/producer";
+import { Topics, UserEvents } from "../../../application/constants/messaging.constants";
 
 @injectable()
 export class UserRepository implements IUserRepository {
@@ -53,14 +54,14 @@ export class UserRepository implements IUserRepository {
       const res = await this.userDataSource.save(userToSave);
 
       this.producer.publish(
-        "user_service",
+        Topics.UserService,
         {
           partition: 0,
           dateTimeOccurred: new Date(),
           eventId: v4(),
           data: user,
-          eventSource: "user_service",
-          eventType: "signup"
+          eventSource: Topics.UserService,
+          eventType: UserEvents.Signup
         },
         {
           noAvroEncoding: true,
@@ -106,6 +107,23 @@ export class UserRepository implements IUserRepository {
         },
         { $set: existingUser }
       );
+
+      this.producer.publish(
+        Topics.UserService,
+        {
+          partition: 0,
+          dateTimeOccurred: new Date(),
+          eventId: v4(),
+          data: user,
+          eventSource: Topics.UserService,
+          eventType: UserEvents.ProfileUpdate
+        },
+        {
+          noAvroEncoding: true,
+          nonTransactional: true
+        }
+      );
+
       return User.create({ ...existingUser, id: existingUser.id.toString() });
     } catch (err) {
       this.logger.error(`<Error> UserRepositoryUpdate - ${err}`);

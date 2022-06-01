@@ -1,15 +1,11 @@
 import { SubscriptionParameters } from "../../domain/ports/messaging/consumer";
-
-const PostServiceTopic = "post_service";
-
-const CreatePostEvent = "create_post";
-const UpdatePostEvent = "update_post";
+import { PostEvents, Topics } from "../constants/messaging.constants";
 
 class PostConsumer {
   onPostCreated(): SubscriptionParameters {
     return {
-      topic: PostServiceTopic,
-      eventTypes: [CreatePostEvent],
+      topic: Topics.PostService,
+      eventTypes: [PostEvents.Created],
       readFromBeginning: true,
       handles: {
         async handle(event) {
@@ -24,8 +20,8 @@ class PostConsumer {
 
   onPostUpdated(): SubscriptionParameters {
     return {
-      topic: PostServiceTopic,
-      eventTypes: [UpdatePostEvent],
+      topic: Topics.PostService,
+      eventTypes: [PostEvents.Updated],
       readFromBeginning: true,
       handles: {
         async handle(event) {
