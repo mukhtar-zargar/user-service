@@ -33,10 +33,7 @@ class PostConsumer {
       }
     };
   }
-
-  getAllPostConsumers() {
-    return [this.onPostCreated(), this.onPostUpdated()];
-  }
 }
 
-export { PostConsumer };
+const postConsumer = new PostConsumer();
+export default [postConsumer.onPostCreated(), postConsumer.onPostUpdated()];

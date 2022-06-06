@@ -15,7 +15,7 @@ import { IAppDataSource } from "../typeorm/typeorm.config";
 import { DomainConsumerMessagingRepositoryKafka } from "../messaging/kafka/consumer";
 import { KafkaConfiguration } from "../messaging/kafka/configuration";
 import { AppSettings } from "../../settings.ts/app.settings";
-import { PostConsumer } from "../../application/consumers/post.consumer";
+import postConsumer from "../../application/consumers/post.consumer";
 
 export async function bootstrap(container: Container, port: number, ...modules: ContainerModule[]) {
   if (!container.isBound(TYPES.App)) {
@@ -59,9 +59,7 @@ export async function bootstrap(container: Container, port: number, ...modules: 
         })
       );
 
-      const postConsumer = new PostConsumer();
-
-      consumer.subscribe(postConsumer.getAllPostConsumers());
+      consumer.subscribe(postConsumer);
 
       const app = server.build();
       app.listen(port, () => {

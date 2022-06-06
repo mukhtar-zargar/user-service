@@ -1,12 +1,5 @@
 import { Expose, Transform, TransformFnParams } from "class-transformer";
-import {
-  IsEmail,
-  IsMongoId,
-  IsOptional,
-  IsString,
-  IsUUID,
-  MinLength
-} from "class-validator";
+import { IsEmail, IsMongoId, IsOptional, IsString, IsUUID, MinLength } from "class-validator";
 
 export class UserDTO {
   @Expose()
@@ -27,6 +20,12 @@ export class UserDTO {
   @MinLength(6)
   @IsString()
   public password: string;
+
+  @Expose()
+  @MinLength(6)
+  @IsString()
+  @IsOptional()
+  public playerId: string;
 }
 export class UserSignUpDTO {
   @Expose()
@@ -45,11 +44,16 @@ export class UserSignUpDTO {
   @MinLength(6)
   @IsString()
   public password: string;
+
+  @Expose()
+  @MinLength(6)
+  @IsString()
+  public playerId: string;
 }
 
 export class UserUpdateDTO extends UserDTO {
   @Expose()
   @MinLength(1)
-  @IsMongoId({ message: "Invalid id", })
+  @IsMongoId({ message: "Invalid id" })
   public id: string;
 }

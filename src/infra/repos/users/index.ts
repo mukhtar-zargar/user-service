@@ -59,7 +59,8 @@ export class UserRepository implements IUserRepository {
           partition: 0,
           dateTimeOccurred: new Date(),
           eventId: v4(),
-          data: user,
+          data: { ...user, id: userToSave.id },
+          value: { ...user, id: userToSave.id },
           eventSource: Topics.UserService,
           eventType: UserEvents.Signup
         },
@@ -115,6 +116,7 @@ export class UserRepository implements IUserRepository {
           dateTimeOccurred: new Date(),
           eventId: v4(),
           data: user,
+          value: user,
           eventSource: Topics.UserService,
           eventType: UserEvents.ProfileUpdate
         },

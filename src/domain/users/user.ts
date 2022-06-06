@@ -19,6 +19,9 @@ export class User extends Entity<IUserProps> {
   get name(): string {
     return this.name;
   }
+  get playerId(): string {
+    return this.name;
+  }
 
   get email(): string {
     return this.email;

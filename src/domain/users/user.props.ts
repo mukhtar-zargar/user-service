@@ -5,6 +5,7 @@ export interface IUserSignInProps {
 
 export interface IUserProps extends IUserSignInProps {
   id?: string;
+  playerId?: string;
   name: string;
   savedPosts?: string[];
   createdAt?: Date;
