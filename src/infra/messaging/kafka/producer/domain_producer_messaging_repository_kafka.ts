@@ -46,7 +46,7 @@ export class DomainProducerMessagingRepositoryKafka implements IDomainProducerMe
       idempotent: true,
       transactionalId: v4(),
       transactionTimeout: this._kafkaConfiguration.KAFKA_TRANSACTION_TIMEOUT,
-      createPartitioner: Partitioners.DefaultPartitioner
+      // createPartitioner: Partitioners.DefaultPartitioner
     });
   }
 
@@ -68,7 +68,7 @@ export class DomainProducerMessagingRepositoryKafka implements IDomainProducerMe
     const request: IProducerRequest = {
       topic: [topic],
       value: JSON.stringify(event.data),
-      partition: 0,
+      // partition: 0,
       seconds: 1,
       avroschemaName: event.schema,
       schemaId: event.schemaId,

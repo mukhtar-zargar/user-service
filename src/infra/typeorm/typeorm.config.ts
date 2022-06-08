@@ -12,7 +12,7 @@ export class AppDataSource {
       type: "mongodb",
       host: AppSettings.DB_HOST,
       port: Number(AppSettings.DB_PORT),
-      database: AppSettings.DB_NAME,
+      database: AppSettings.DB_USER_NAME,
       username: AppSettings.DB_USER,
       password: AppSettings.DB_PASSWORD,
       authSource: AppSettings.DB_AUTHSOURCE,

@@ -8,6 +8,7 @@
     "dev": "nodemon src/app.ts",
     "ts": "ts-node src/app.ts",
     "clean": "rimraf dist/",
+    "build": "npm run clean && tsc",
     "lint": "eslint src --ext ts",
     "lint-fix": "eslint . --ext .ts --fix",
     "prettier-format": "prettier --config .prettierrc src/**/*.ts --write",

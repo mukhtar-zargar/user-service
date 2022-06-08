@@ -5,7 +5,7 @@ dotenv.config();
 export class AppSettings {
   public static readonly PORT = process.env.PORT || 3000;
   public static readonly DB_TYPE = process.env.DB_TYPE;
-  public static readonly DB_NAME = process.env.DB_NAME;
+  public static readonly DB_USER_NAME = process.env.DB_USER_NAME;
   public static readonly DB_HOST = process.env.DB_HOST;
   public static readonly DB_PORT = process.env.DB_PORT;
   public static readonly DB_USER = process.env.DB_USER;

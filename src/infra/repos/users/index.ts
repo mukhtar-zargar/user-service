@@ -56,7 +56,7 @@ export class UserRepository implements IUserRepository {
       this.producer.publish(
         Topics.UserService,
         {
-          partition: 0,
+          // partition: 0,
           dateTimeOccurred: new Date(),
           eventId: v4(),
           data: { ...user, id: userToSave.id },
@@ -112,7 +112,7 @@ export class UserRepository implements IUserRepository {
       this.producer.publish(
         Topics.UserService,
         {
-          partition: 0,
+          // partition: 0,
           dateTimeOccurred: new Date(),
           eventId: v4(),
           data: user,

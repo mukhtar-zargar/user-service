@@ -90,7 +90,6 @@ export class DomainConsumerMessagingRepositoryKafka implements IDomainConsumerMe
 
             await this.enqueueForProcessing(decodedMessage, subscriptionParameters, consumer);
           }
-
         });
         await Promise.all(subscriptionPromises);
       }
@@ -116,8 +115,8 @@ export class DomainConsumerMessagingRepositoryKafka implements IDomainConsumerMe
       key: payload.message.key ? payload.message.key.toString("utf-8") : "",
       value,
       headers: undefined,
-      topic: payload.topic,
-      partition: payload.partition
+      topic: payload.topic
+      // partition: payload.partition
     };
     return decodedMessage;
   }
