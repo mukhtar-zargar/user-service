@@ -12,7 +12,7 @@ import { TYPES } from "../../../application/constants/types";
 import { CustomError } from "../../errors/base.error";
 import { IAppDataSource } from "../../typeorm/typeorm.config";
 import { getObjectId } from "../../typeorm/utils";
-import { IDomainProducerMessagingRepository } from "../../../domain/ports/messaging/producer";
+// import { IDomainProducerMessagingRepository } from "../../../domain/ports/messaging/producer";
 import { Topics, UserEvents } from "../../../application/constants/messaging.constants";
 
 @injectable()
@@ -20,17 +20,17 @@ export class UserRepository implements IUserRepository {
   protected logger: ILogger;
   protected userDataSource: MongoRepository<UserModel>;
 
-  protected producer: IDomainProducerMessagingRepository;
+  // protected producer: IDomainProducerMessagingRepository;
 
   constructor(
     @inject(TYPES.Logger) logger: Logger,
-    @inject(TYPES.DataSource) appDataSource: IAppDataSource,
-    @inject(TYPES.MessagingProducer) producer: () => IDomainProducerMessagingRepository
+    @inject(TYPES.DataSource) appDataSource: IAppDataSource
+    // @inject(TYPES.MessagingProducer) producer: () => IDomainProducerMessagingRepository
   ) {
     this.logger = logger.get();
     this.userDataSource = appDataSource.instance().getMongoRepository(UserModel);
 
-    this.producer = producer();
+    // this.producer = producer();
   }
 
   getAll(): Promise<User[]> {
@@ -53,22 +53,22 @@ export class UserRepository implements IUserRepository {
       let userToSave = this.userDataSource.create(user);
       const res = await this.userDataSource.save(userToSave);
 
-      this.producer.publish(
-        Topics.UserService,
-        {
-          // partition: 0,
-          dateTimeOccurred: new Date(),
-          eventId: v4(),
-          data: { ...user, id: userToSave.id },
-          value: { ...user, id: userToSave.id },
-          eventSource: Topics.UserService,
-          eventType: UserEvents.Signup
-        },
-        {
-          noAvroEncoding: true,
-          nonTransactional: true
-        }
-      );
+      // this.producer.publish(
+      //   Topics.UserService,
+      //   {
+      //     // partition: 0,
+      //     dateTimeOccurred: new Date(),
+      //     eventId: v4(),
+      //     data: { ...user, id: userToSave.id },
+      //     value: { ...user, id: userToSave.id },
+      //     eventSource: Topics.UserService,
+      //     eventType: UserEvents.Signup
+      //   },
+      //   {
+      //     noAvroEncoding: true,
+      //     nonTransactional: true
+      //   }
+      // );
 
       return User.create({ ...res, id: res.id.toString() });
     } catch (err) {
@@ -109,22 +109,22 @@ export class UserRepository implements IUserRepository {
         { $set: existingUser }
       );
 
-      this.producer.publish(
-        Topics.UserService,
-        {
-          // partition: 0,
-          dateTimeOccurred: new Date(),
-          eventId: v4(),
-          data: user,
-          value: user,
-          eventSource: Topics.UserService,
-          eventType: UserEvents.ProfileUpdate
-        },
-        {
-          noAvroEncoding: true,
-          nonTransactional: true
-        }
-      );
+      // this.producer.publish(
+      //   Topics.UserService,
+      //   {
+      //     // partition: 0,
+      //     dateTimeOccurred: new Date(),
+      //     eventId: v4(),
+      //     data: user,
+      //     value: user,
+      //     eventSource: Topics.UserService,
+      //     eventType: UserEvents.ProfileUpdate
+      //   },
+      //   {
+      //     noAvroEncoding: true,
+      //     nonTransactional: true
+      //   }
+      // );
 
       return User.create({ ...existingUser, id: existingUser.id.toString() });
     } catch (err) {
