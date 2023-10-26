@@ -1,0 +1,20 @@
+{
+  "folders": [
+	{
+		"path": "user_service"
+	},
+	{
+		"path": "ms_devops"
+	},
+	{
+		"path": "notifier_service"
+	},
+	{
+		"path": "post_service"
+	},
+	{
+		"path": "envs"
+	}
+],
+  "settings": {}
+}
